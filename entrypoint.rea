@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+# Configure: rea
+if [[ ! -e "${EP_RUN}" ]] ; then
+	log "Configuring $(basename "${0}") for first run ..."
+
+	install --directory --group="${REA_NAME}" --mode=0750 --owner="${REA_NAME}" \
+		"${REA_HOME}" \
+		"${REA_KUNA_CACHE_DIR}"
+fi
+
+# Configure: optional analysis providers
+if [[ -z "${REA_ANALYSIS_PROVIDER:-}" ]] ; then
+	case "$(uname --machine)" in
+		x86_64|amd64) export REA_ANALYSIS_PROVIDER=ghidra ;;
+		aarch64|arm64) export REA_ANALYSIS_PROVIDER=kuna ;;
+	esac
+fi
+
+if [[ -z "${HOPPER_LAUNCHER_PATH:-}" && -x /opt/hopper/bin/Hopper ]] ; then
+	export HOPPER_LAUNCHER_PATH=/opt/hopper/bin/Hopper
+fi
+
+if [[ -z "${REA_IDA_MCP_CONFIG:-}" && -r /etc/rea/ida-mcp.json ]] ; then
+	export REA_IDA_MCP_CONFIG=/etc/rea/ida-mcp.json
+fi

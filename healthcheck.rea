@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+log "Checking if $(basename "${0}") is healthy ..."
+[[ "${MCP_PORT}" =~ ^[0-9]+$ ]]
+timeout 5 bash -c "exec 3<>/dev/tcp/127.0.0.1/${MCP_PORT}"
